@@ -21,8 +21,16 @@ export default defineConfig({
 function buildOnlyNitro(): PluginOption[] {
   const nitroPlugins = nitro() as PluginOption[] | PluginOption | false | null | undefined;
 
-  return (Array.isArray(nitroPlugins) ? nitroPlugins : nitroPlugins ? [nitroPlugins] : []).map((plugin) => ({
+  return flattenPlugins(nitroPlugins).map((plugin) => ({
     ...plugin,
     apply: "build",
   } as PluginOption));
+}
+
+function flattenPlugins(plugin: PluginOption[] | PluginOption | false | null | undefined): PluginOption[] {
+  if (!plugin) return [];
+  if (Array.isArray(plugin)) {
+    return plugin.flatMap((item) => flattenPlugins(item));
+  }
+  return [plugin];
 }
